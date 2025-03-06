@@ -31,7 +31,7 @@ router.post('/register', async (req, res) => {
 
         if (existingEmail) {
             logger.error('Email already exists.')
-            res.status(404).json({status: 404, message: 'Email already exists.'})
+            res.status(404).json({ status: 404, message: 'Email already exists.' })
         }
 
         const salt = await bcryptjs.genSalt(10);
@@ -77,7 +77,7 @@ router.post('/login', async (req, res) => {
         // Task 4: Check if the password matches the encrypyted password and send appropriate message on mismatch
         if (existingUser) {
             let result = await bcryptjs.compare(req.body.password, existingUser.password)
-            if(!result) {
+            if (!result) {
                 logger.error('Passwords do not match');
                 return res.status(404).json({ error: 'Wrong pasword' });
             }
@@ -92,17 +92,67 @@ router.post('/login', async (req, res) => {
             };
             const authtoken = jwt.sign(payload, JWT_SECRET)
             logger.info("User logged in successfully");
-            return res.status(200).json({authtoken, userName, userEmail})
+            return res.status(200).json({ authtoken, userName, userEmail })
         } else {
             logger.error('User not found');
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json({authtoken, userName, userEmail });
+        res.json({ authtoken, userName, userEmail });
         // Task 7: Send appropriate message if user not found
     } catch (e) {
-         return res.status(500).send('Internal server error');
+        return res.status(500).send('Internal server error');
 
     }
 });
 
+// {Insert it along with other imports} Task 1: Use the `body`,`validationResult` from `express-validator` for input validation
+
+router.put('/update', async (req, res) => {
+    // Task 2: Validate the input using `validationResult` and return approiate message if there is an error.
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        logger.error('Validation errors in update request', errors.array());
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        // Task 3: Check if `email` is present in the header and throw an appropriate error message if not present.
+        const email = req.headers.email;
+        if (!email) {
+            logger.error('Email not found in the request headers');
+            return res.status(400).json({ error: "Email not found in the request headers" });
+        }
+        // Task 4: Connect to MongoDB
+        const db = await connectToDatabase();
+        const collection = db.collection("users");
+
+        // Task 5: find user credentials in database
+        const existingUser = collection.findOne({ email })
+        if (!existingUser) {
+            logger.error('User not found');
+            return res.status(404).json({ error: "User not found" });
+        }
+        // Task 6: update user credentials in database
+
+        existingUser.firstName = req.body.name
+        existingUser.updatedAt = new Date();
+        const updatedUser = await collection.findOneAndUpdate(
+            { email },
+            { $set: existingUser },
+            { returnDocument: 'after' }
+        );
+        const payload = {
+            user: {
+                id: updatedUser._id.toString(),
+            },
+        };
+        // Task 7: create JWT authentication using secret key from .env file
+        const authtoken = jwt.sign(payload, JWT_SECRET);
+        logger.info("User updated successfully")
+        res.json({ authtoken });
+    } catch (e) {
+        return res.status(500).send('Internal server error');
+
+    }
+});
 module.exports = router;
