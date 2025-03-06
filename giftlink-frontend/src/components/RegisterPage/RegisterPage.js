@@ -24,7 +24,7 @@ function RegisterPage() {
                         <h2 className="text-center mb-4 font-weight-bold">Register</h2>
 
                         {/* insert code here to create input elements for all the variables - firstName, lastName, email, password */}
-                        <div className="mb-4">
+                        <div className="mb-3">
 
                             <label htmlFor="firstName" className="form label"> First Name</label><br />
                             <input
@@ -36,7 +36,7 @@ function RegisterPage() {
                                 onChange={(e) => setFirstName(e.target.value)}
                             />
                         </div>
-                        <div className="mb-4">
+                        <div className="mb-3">
 
                             <label htmlFor="lastName" className="form label"> Last Name</label><br />
                             <input
@@ -48,7 +48,7 @@ function RegisterPage() {
                                 onChange={(e) => setLastName(e.target.value)}
                             />
                         </div>
-                        <div className="mb-4">
+                        <div className="mb-3">
 
                             <label htmlFor="emailInput" className="form label"> Email</label><br />
                             <input
@@ -60,7 +60,7 @@ function RegisterPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </div>
-                        <div className="mb-4">
+                        <div className="mb-3">
 
                             <label htmlFor="passwordInput" className="form label"> Password</label><br />
                             <input
