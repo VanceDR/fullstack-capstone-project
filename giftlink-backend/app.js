@@ -7,9 +7,15 @@ const pinoLogger = require('./logger');
 const connectToDatabase = require('./models/db');
 const {loadData} = require("./util/import-mongo/index");
 
+// ROUTES IMPORTS
+const giftRoutes = require('./routes/giftRoutes');
+
 
 const app = express();
 app.use("*",cors());
+
+// ROUTES USE
+app.use('/api/gifts', giftRoutes);
 const port = 3060;
 
 // Connect to MongoDB; we just do this one time
