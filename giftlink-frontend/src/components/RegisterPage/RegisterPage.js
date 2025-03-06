@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { urlConfig } from '../../config'
+import { useAppContext } from '../../context/AuthContext'
+import { useNavigate } from 'react-router-dom';
 
 import './RegisterPage.css';
 
@@ -10,14 +13,49 @@ function RegisterPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
+    const [showError, setShowError] = useState('')
+    
+    const navigate = useNavigate();
+    const { setIsLoggedIn } = useAppContext();
+
     // insert code here to create handleRegister function and include console.log
     const handleRegister = async () => {
-        console.log("Handle Register")
+        try {
+            const response = await fetch(`${urlConfig.backendUrl}/api/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'content-type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "firstName": firstName,
+                    "lastName": lastName,
+                    "email": email,
+                    "password": password
+                }),
+            })
+            const json = await response.json();
+            if (json.error) {
+                setShowError(json.error);
+            }
+
+            if (json.authtoken) {
+                sessionStorage.setItem('auth-token', json.authtoken)
+                sessionStorage.setItem('name', firstName);
+                sessionStorage.setItem('email', json.email);
+                setIsLoggedIn(true);
+                navigate('/app')
+            }
+            
+            
+        } catch (err) {
+            console.log("Error fetching details: " + err.message);
+        }
+        
     }
 
-
+    
     return (
-        <div className="container mt-5">
+        <div className="conatiner-mb mt-5">
             <div className="row justify-content-center">
                 <div className="col-md-6 col-lg-4">
                     <div className="register-card p-4 border rounded">
@@ -79,6 +117,7 @@ function RegisterPage() {
                         </p>
 
                     </div>
+                    <div className="text-danger">{showError}</div>
                 </div>
             </div>
         </div>
