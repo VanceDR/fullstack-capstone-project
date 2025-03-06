@@ -26,7 +26,7 @@ function LoginPage() {
     // insert code here to create handleLogin function and include console.log
     const handleLogin = async () => {
         try {
-            const response = await fetch(`/api/auth/login`, {
+            const response = await fetch(`${urlConfig.backendUrl}/api/auth/login`, {
                 //Task 7: Set Method
                 method: 'POST',
                 //Task 8: Set headers
@@ -51,7 +51,6 @@ function LoginPage() {
                 document.getElementById("email").value = "";
                 document.getElementById("password").value = "";
                 setIncorrect("Wrong password or email. Try again.");
-                //Below is optional, but recommended - Clear out error message after 2 seconds
                 setTimeout(() => {
                     setIncorrect("");
                 }, 2000);
@@ -99,7 +98,7 @@ function LoginPage() {
                         </p>
 
                     </div>
-                    <span style={{color:'red',height:'.5cm',display:'block',fontStyle:'italic',fontSize:'12px'}}>{incorrect}</span>
+                    <span style={{ color: 'red', height: '.5cm', display: 'block', fontStyle: 'italic', fontSize: '12px' }}>{incorrect}</span>
                 </div>
             </div>
         </div>
