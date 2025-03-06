@@ -8,7 +8,6 @@ const dotenv = require('dotenv');
 const pino = require('pino');  // Import Pino logger
 
 const router = express.Router();
-const app = express();
 
 //Step 1 - Task 3: Create a Pino logger instance
 const logger = pino()
@@ -31,7 +30,7 @@ router.post('/register', async (req, res) => {
 
         if (existingEmail) {
             logger.error('Email already exists.')
-            res.status(404).json({ status: 404, message: 'Email already exists.' })
+            return res.status(404).json({ error: 'Email already exists.' })
         }
 
         const salt = await bcryptjs.genSalt(10);
@@ -57,7 +56,7 @@ router.post('/register', async (req, res) => {
         logger.info('User registered successfully');
         res.json({ authtoken, email });
     } catch (e) {
-        return res.status(500).send('Internal server error');
+        res.status(500).send('Internal server error');
     }
 });
 
@@ -70,34 +69,33 @@ router.post('/login', async (req, res) => {
         const collection = db.collection("users");
 
         // Task 3: Check for user credentials in database
-        const existingUser = collection.findOne({
+        const existingUser = await collection.findOne({
             email: req.body.email
         })
 
-        // Task 4: Check if the password matches the encrypyted password and send appropriate message on mismatch
-        if (existingUser) {
-            let result = await bcryptjs.compare(req.body.password, existingUser.password)
-            if (!result) {
-                logger.error('Passwords do not match');
-                return res.status(404).json({ error: 'Wrong pasword' });
-            }
-            // Task 5: Fetch user details from database
-            const userName = existingUser.firstName;
-            const userEmail = existingUser.email;
-            // Task 6: Create JWT authentication if passwords match with user._id as payload
-            const payload = {
-                user: {
-                    id: existingUser._id.toString(),
-                },
-            };
-            const authtoken = jwt.sign(payload, JWT_SECRET)
-            logger.info("User logged in successfully");
-            return res.status(200).json({ authtoken, userName, userEmail })
-        } else {
+        if (!existingUser) {
             logger.error('User not found');
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json({ authtoken, userName, userEmail });
+        // Task 4: Check if the password matches the encrypyted password and send appropriate message on mismatch
+        let result = await bcryptjs.compare(req.body.password, existingUser.password)
+        logger.info('LOGGER: password check result', result)
+        if (!result) {
+            logger.error('Passwords do not match');
+            return res.status(404).json({ error: 'Wrong pasword' });
+        }
+        // Task 5: Fetch user details from database
+        const userName = existingUser.firstName;
+        const userEmail = existingUser.email;
+        // Task 6: Create JWT authentication if passwords match with user._id as payload
+        const payload = {
+            user: {
+                id: existingUser._id.toString(),
+            },
+        };
+        const authtoken = jwt.sign(payload, JWT_SECRET)
+        logger.info("User logged in successfully");
+        return res.status(200).json({ authtoken, userName, userEmail })
         // Task 7: Send appropriate message if user not found
     } catch (e) {
         return res.status(500).send('Internal server error');
@@ -127,7 +125,7 @@ router.put('/update', async (req, res) => {
         const collection = db.collection("users");
 
         // Task 5: find user credentials in database
-        const existingUser = collection.findOne({ email })
+        const existingUser = await collection.findOne({ email })
         if (!existingUser) {
             logger.error('User not found');
             return res.status(404).json({ error: "User not found" });

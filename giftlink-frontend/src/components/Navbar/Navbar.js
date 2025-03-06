@@ -37,7 +37,7 @@ export default function Navbar() {
             <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul className="navbar-nav">
                     <li className="nav-item">
-                        <Link className="nav-link" to="/home.html">Home</Link> {/* Link to home.html */}
+                        <a className="nav-link" href="/home.html">Home</a> {/* Link to home.html */}
                     </li>
                     <li className="nav-item">
                         <Link className="nav-link" to="/app">Gifts</Link> {/* Updated Link */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useConfig } from '../../config'
+import { urlConfig } from '../../config'
 import { useAppContext } from '../../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
@@ -31,29 +31,29 @@ function LoginPage() {
                 method: 'POST',
                 //Task 8: Set headers
                 headers: {
-                    'content-type': 'application/json',
+                    'Content-Type': 'application/json',
                     'Authorization': bearerToken ? `Bearer ${bearerToken}` : ``
                 },
                 //Task 9: Set body to send user details
                 body: JSON.stringify({
                     email: email,
-                    password: password,
+                    password: password
                 })
             })
             const json = await response.json()
+            console.log(json);
+            if (json.error) {
+                setIncorrect("Wrong password or email. Try again.");
+                setTimeout(() => {
+                    setIncorrect("");
+                }, 2000);
+            } 
             if (json.authtoken) {
                 sessionStorage.setItem('auth-token', json.authtoken);
                 sessionStorage.setItem('name', json.userName);
                 sessionStorage.setItem('email', json.userEmail);
                 setIsLoggedIn(true)
                 navigate('/app')
-            } else {
-                document.getElementById("email").value = "";
-                document.getElementById("password").value = "";
-                setIncorrect("Wrong password or email. Try again.");
-                setTimeout(() => {
-                    setIncorrect("");
-                }, 2000);
             }
         } catch (e) {
             console.log("Error fetching details: " + e.message);
@@ -96,9 +96,9 @@ function LoginPage() {
                         <p className="mt-4 text-center">
                             New here? <a href="/app/register" className="text-primary">Register Here</a>
                         </p>
+                            <span style={{ color: 'red', height: '.5cm', display: 'block', fontStyle: 'italic', fontSize: '12px' }}>{incorrect}</span>
 
                     </div>
-                    <span style={{ color: 'red', height: '.5cm', display: 'block', fontStyle: 'italic', fontSize: '12px' }}>{incorrect}</span>
                 </div>
             </div>
         </div>

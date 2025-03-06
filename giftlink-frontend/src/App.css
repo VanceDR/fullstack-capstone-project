@@ -21,6 +21,7 @@ body,
   background-color: #f4f4f4; /* Light grey */
   /* margin-right: calc(100vw - 100%); */
   margin: auto;
+  padding:0;
 }
 
 /* Background color for cards */

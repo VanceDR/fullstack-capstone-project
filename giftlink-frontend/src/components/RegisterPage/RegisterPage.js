@@ -36,6 +36,7 @@ function RegisterPage() {
             const json = await response.json();
             if (json.error) {
                 setShowError(json.error);
+                setTimeout(() => setShowError(''), 2000)
             }
 
             if (json.authtoken) {
