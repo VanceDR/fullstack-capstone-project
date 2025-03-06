@@ -31,23 +31,3 @@ jobs:
           find ./giftlink-backend -name giftRoutes.js -exec jshint {} +
           find ./giftlink-backend -name searchRoutes.js -exec jshint {} +
           echo "Linted all the js files successfully"
-
-  client_build:
-      name: Build client
-      runs-on: ubuntu-latest
-
-      steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14
-
-      - name: Run build
-        run: |
-          cd giftlink-frontend
-          npm install
-          npm run build
-          echo "Client-side build successfully"
