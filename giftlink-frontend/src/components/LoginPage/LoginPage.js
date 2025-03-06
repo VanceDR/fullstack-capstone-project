@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useConfig } from '../../config'
+import { useAppContext } from '../../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
+
+
 import './LoginPage.css';
 
 function LoginPage() {
@@ -6,9 +11,54 @@ function LoginPage() {
     //insert code here to create useState hook variables for email, password
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    const [incorrect, setIncorrect] = useState(false)
+
+    const navigate = useNavigate();
+    const bearerToken = sessionStorage.getItem('bearer-token');
+    const { setIsLoggedIn } = useAppContext();
+
+    useEffect(() => {
+        if (sessionStorage.getItem('auth-token')) {
+            navigate('/app')
+        }
+    }, [navigate])
     // insert code here to create handleLogin function and include console.log
     const handleLogin = async () => {
-        console.log("Handle Login")
+        try {
+            const response = await fetch(`/api/auth/login`, {
+                //Task 7: Set Method
+                method: 'POST',
+                //Task 8: Set headers
+                headers: {
+                    'content-type': 'application/json',
+                    'Authorization': bearerToken ? `Bearer ${bearerToken}` : ``
+                },
+                //Task 9: Set body to send user details
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                })
+            })
+            const json = await response.json()
+            if (json.authtoken) {
+                sessionStorage.setItem('auth-token', json.authtoken);
+                sessionStorage.setItem('name', json.userName);
+                sessionStorage.setItem('email', json.userEmail);
+                setIsLoggedIn(true)
+                navigate('/app')
+            } else {
+                document.getElementById("email").value = "";
+                document.getElementById("password").value = "";
+                setIncorrect("Wrong password or email. Try again.");
+                //Below is optional, but recommended - Clear out error message after 2 seconds
+                setTimeout(() => {
+                    setIncorrect("");
+                }, 2000);
+            }
+        } catch (e) {
+            console.log("Error fetching details: " + e.message);
+        }
     }
     return (
         <div className="container-mb mt-5 mb-5">
@@ -49,6 +99,7 @@ function LoginPage() {
                         </p>
 
                     </div>
+                    <span style={{color:'red',height:'.5cm',display:'block',fontStyle:'italic',fontSize:'12px'}}>{incorrect}</span>
                 </div>
             </div>
         </div>
