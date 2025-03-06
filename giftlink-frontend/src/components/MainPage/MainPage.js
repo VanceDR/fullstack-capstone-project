@@ -48,7 +48,7 @@ function MainPage() {
 
                             {/* // Task 4: Display gift image or placeholder */}
                             {gift.image ? (
-                                <img src={gift.image} alt={gift.name} className="img-fluid"/>
+                                <img src={gift.image} alt={gift.name} className="card-img-top img-fluid"/>
                             ) : (
                                 <div className="no-image-available">No Image Available</div>
                             )}

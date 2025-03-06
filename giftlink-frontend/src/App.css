@@ -92,6 +92,14 @@ body,
   border-top-right-radius: 0.25rem;
 }
 
+.card-img-top {
+    width: 100%;
+    /* Full width */
+    height: 180px;
+    /* Fixed height */
+    object-fit: cover;
+    /* Cover the entire area without stretching */
+}
 
 .card-body {
   padding: 1rem;
