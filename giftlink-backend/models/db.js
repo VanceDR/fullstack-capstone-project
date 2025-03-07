@@ -12,7 +12,7 @@ async function connectToDatabase() {
     if (dbInstance){
         return dbInstance
     };
-
+    console.log(url, dbInstance)
     const client = new MongoClient(url);      
 
     // Task 1: Connect to MongoDB
